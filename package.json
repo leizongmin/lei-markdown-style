@@ -1,0 +1,25 @@
+{
+  "name": "@leizm/markdown-style",
+  "version": "1.0.0",
+  "description": "Markdown样式文件",
+  "main": "lei-md.css",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "build": "lessc lei-md.less lei-md.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leizongmin/lei-markdown-style.git"
+  },
+  "author": "Zongmin Lei <leizongmin@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/leizongmin/lei-markdown-style/issues"
+  },
+  "homepage": "https://github.com/leizongmin/lei-markdown-style#readme",
+  "devDependencies": {
+    "less": "^3.9.0"
+  }
+}

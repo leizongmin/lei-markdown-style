@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Node 8：迎接 async await 新时代</title>
+  <link rel="stylesheet" href="../lei-md.css">
+</head>
+
+<body>
+  <article class="lei-md">
+    <h2 id="-">前言</h2>
+    <p>在今年 11 月份 Node.js 发布 <strong>v8.x</strong> LTS 版本之后，终于可以不用借助额外的工具就可以使用 ESNext 标准中的 <code>async function</code>
+      来进行异步编程，彻底改变了我们的编程习惯。以前被人诟病的 <a
+        href="https://75team.com/post/%E8%AF%91%E5%9B%9E%E8%B0%83%E5%9C%B0%E7%8B%B1.html">回调地狱</a> 将不复存在，而且再也不需要使用
+      Generator 这种 <em>撇脚</em> 的方式了（请阅读我于去年写的文章<a
+        href="http://morning.work/page/maintainable-nodejs/asynchronous-programming.html">《基于 Generator 与 Promise
+        的异步编程解决方案》</a>）。</p>
+    <p>在此之前，为了在 Node v6.x 及更早的版本中使用 <code>async function</code>，我们需要使用 <a href="https://babeljs.io">Babel</a> 或者 <a
+        href="https://www.typescriptlang.org">TypeScript</a> 这样的工具将代码转换成使用 <code>callback</code> 或者
+      <code>Generator</code> 的方式。而 <strong>根据以往的经验，这些被转换过的代码执行效率都比较低，比如 Node v4.x 以前的 Generator 和之后的 原生
+        Promise</strong>。因此，为了让我们更有信心地使用 <code>async function</code>，我做了一些简单的性能测试，请看下文。</p>
+    <h2 id="-">测试方法与代码</h2>
+    <p>原始的代码使用 TypeScript 编写，然后通过命令 <code>tsc --target esnext|es6|es5</code> 将其分别转换为不同的目标代码（文件：<a
+        href="https://github.com/leizongmin/morning.work/blob/gh-pages/examples/2017-12/async-await/build.sh">build.sh</a>）：
+    </p>
+    <ul>
+      <li><strong>ESNext</strong> - 使用 <code>async function</code> 方式，文件：<a
+          href="https://github.com/leizongmin/morning.work/blob/gh-pages/examples/2017-12/async-await/out/esnext.js">esnext.js</a>
+      </li>
+      <li><strong>ES6</strong> - 使用 <code>Generator</code> 方式，文件：<a
+          href="https://github.com/leizongmin/morning.work/blob/gh-pages/examples/2017-12/async-await/out/es6.js">es6.js</a>
+      </li>
+      <li><strong>ES5</strong> - 使用 <code>callback</code> 方式（注意：<strong>使用此方式会生成很多无用的代码，其主要是用于模拟 Generator，比我们自己手写的
+          callback 代码低效很多</strong>），文件：<a
+          href="https://github.com/leizongmin/morning.work/blob/gh-pages/examples/2017-12/async-await/out/es5.js">es5.js</a>
+      </li>
+    </ul>
+    <p>被编译后的代码会分别在 Node.js 各个主要版本上执行：<strong>v4.8.7</strong>、<strong>6.12.2</strong>、<strong>8.9.3</strong> 和
+      <strong>9.3.0</strong>（为了描述方便，下文会简单描述为 4.x、6.x、8.x 和 9.x），其中由于 v4.x 和 v6.x 不支持 <code>async function</code>
+      则不需要执行该测试。执行花费的时间取开始和结束的 <code>process.uptime()</code> 之差（单位为秒），内存占用取
+      <code>process.memoryUsage().rss / 1000000</code>（单位为 MB）。</p>
+    <p>以下是 TypeScript 源码：</p>
+    <pre><code class="lang-typescript"><span class="hljs-meta">"use strict"</span>;
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">add</span>(<span class="hljs-params">n</span>): <span class="hljs-title">Promise</span>&lt;<span class="hljs-title">number</span>&gt; </span>{
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Promise</span>(<span class="hljs-function">(<span class="hljs-params">resolve, reject</span>) =&gt;</span> {
+        resolve(n + <span class="hljs-number">1</span>);
+      });
+    }
+
+    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">call</span>(<span class="hljs-params"></span>) </span>{
+      <span class="hljs-keyword">const</span> a = <span class="hljs-keyword">await</span> add(<span class="hljs-number">1</span>);
+      <span class="hljs-keyword">const</span> b = <span class="hljs-keyword">await</span> add(<span class="hljs-number">2</span>);
+      <span class="hljs-keyword">const</span> c = <span class="hljs-keyword">await</span> add(<span class="hljs-number">3</span>);
+      <span class="hljs-keyword">const</span> d = <span class="hljs-keyword">await</span> add(<span class="hljs-number">4</span>);
+      <span class="hljs-keyword">return</span> a + b + c + d === <span class="hljs-number">14</span>;
+    }
+
+    <span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">test</span>(<span class="hljs-params">n: <span class="hljs-built_in">number</span></span>) </span>{
+      <span class="hljs-keyword">const</span> version = <span class="hljs-string">`node <span class="hljs-subst">${process.version}</span>`</span>;
+      <span class="hljs-keyword">const</span> name = __filename
+        .split(<span class="hljs-regexp">/\\|\//</span>)
+        .pop()
+        .slice(<span class="hljs-number">0</span>, <span class="hljs-number">-3</span>);
+      <span class="hljs-keyword">const</span> promise =
+        <span class="hljs-built_in">Promise</span>.toString().indexOf(<span class="hljs-string">"[native code]"</span>) !== <span class="hljs-number">-1</span>
+          ? <span class="hljs-string">"ES6 Promise"</span>
+          : <span class="hljs-string">"bluebird Promise"</span>;
+      <span class="hljs-keyword">const</span> title = <span class="hljs-string">`<span class="hljs-subst">${version}</span> <span class="hljs-subst">${name}</span> with <span class="hljs-subst">${promise}</span> - test <span class="hljs-subst">${n}</span> times`</span>;
+      <span class="hljs-keyword">const</span> time = process.uptime();
+      <span class="hljs-keyword">for</span> (<span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>; i &lt; n; i++) {
+        <span class="hljs-keyword">await</span> call();
+      }
+      <span class="hljs-built_in">console</span>.log(
+        <span class="hljs-string">"%s - %ds - %dMB"</span>,
+        title,
+        (process.uptime() - time).toFixed(<span class="hljs-number">2</span>),
+        (process.memoryUsage().rss / <span class="hljs-number">1000000</span>).toFixed(<span class="hljs-number">1</span>)
+      );
+    }
+
+    <span class="hljs-keyword">const</span> K = <span class="hljs-number">1000</span>;
+    <span class="hljs-keyword">let</span> num = <span class="hljs-built_in">parseInt</span>(process.env.NUM, <span class="hljs-number">10</span>);
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(num) || !(num &gt; <span class="hljs-number">0</span>)) {
+      num = <span class="hljs-number">100</span>;
+    }
+    test(num * K);
+    </code></pre>
+    <p>说明：</p>
+    <ul>
+      <li><code>add()</code> 模拟一个简单的异步操作，通过 <code>Promise</code> 实现，返回输入参数 <code>n</code> 的值加 <code>1</code></li>
+      <li><code>call()</code> 模拟一次异步调用流程，包含 <code>4</code> 次 <code>add()</code> 异步操作</li>
+      <li><code>test()</code> 是测试流程控制，包含循环多次测试 <code>call()</code> 并返回计算总花费时间和内存占用，并打印出结果</li>
+    </ul>
+    <h2 id="-">测试结果分析</h2>
+    <p>我们首先看看执行 <strong>100 万次</strong> <code>call()</code> 时，使用 <code>callback</code> 和 <code>Generator</code>
+      在各个版本上执行的情况：</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Node.js 版本</th>
+          <th>异步方式</th>
+          <th>花费时间（s）</th>
+          <th>内存占用（MB）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>v4.x</td>
+          <td>callback</td>
+          <td>45</td>
+          <td>238.9</td>
+        </tr>
+        <tr>
+          <td>同上</td>
+          <td>Generator</td>
+          <td>24.02</td>
+          <td>71.5</td>
+        </tr>
+        <tr>
+          <td>v6.x</td>
+          <td>callback</td>
+          <td>20.02</td>
+          <td>61.9</td>
+        </tr>
+        <tr>
+          <td>同上</td>
+          <td>Generator</td>
+          <td>22.62</td>
+          <td>69</td>
+        </tr>
+        <tr>
+          <td>v8.x</td>
+          <td>callback</td>
+          <td>5.57</td>
+          <td>85.8</td>
+        </tr>
+        <tr>
+          <td>同上</td>
+          <td>Generator</td>
+          <td>5.72</td>
+          <td>96.3</td>
+        </tr>
+        <tr>
+          <td>v9.x</td>
+          <td>callback</td>
+          <td>6.4</td>
+          <td>91.9</td>
+        </tr>
+        <tr>
+          <td>同上</td>
+          <td>Generator</td>
+          <td>6.59</td>
+          <td>96.8</td>
+        </tr>
+      </tbody>
+    </table>
+    <p> 由上表可以看出，从 v6.x 到 v8.x 其花费的时间和内存占用都降低了很多（v9.x 由于是非稳定版本的原因，测试结果比 v8.x 差是可以理解的），<strong>说明新版本的 Node.js
+        性能都有了很大的提升。</strong></p>
+    <p>我们关心的第一个问题是：<strong>直接使用 async function 会比转成相应的 Genrator 代码高效吗？</strong></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Node.js 版本</th>
+          <th>异步方式</th>
+          <th>花费时间（s）</th>
+          <th>内存占用（MB）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>v4.x</td>
+          <td>Generator</td>
+          <td>24.02</td>
+          <td>71.5</td>
+        </tr>
+        <tr>
+          <td>v6.x</td>
+          <td>Generator</td>
+          <td>22.62</td>
+          <td>69</td>
+        </tr>
+        <tr>
+          <td>v8.x</td>
+          <td>Generator</td>
+          <td>5.72</td>
+          <td>96.3</td>
+        </tr>
+        <tr>
+          <td>同上</td>
+          <td>async</td>
+          <td><strong>1.76</strong></td>
+          <td><strong>31.5</strong></td>
+        </tr>
+        <tr>
+          <td>v9.x</td>
+          <td>Generator</td>
+          <td>6.59</td>
+          <td>96.8</td>
+        </tr>
+        <tr>
+          <td>同上</td>
+          <td>async</td>
+          <td><strong>1.91</strong></td>
+          <td><strong>31.5</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>答案是肯定的。<strong>在 Node v8.x 上使用 async function 比转成相应的 Generator 代码执行性能提高了 3 倍。</strong></p>
+    <p>一直以来我们都有一个印象，原生 Promise 性能很差，一般会使用 <code>bluebird</code> 这种第三方 Promise 实现来代替。那么第二个问题来了：<strong>使用 bluebird 代替原生
+        Promise 会不会更高效？</strong></p>
+    <p>（方法：执行测试程序前通过 <code>global.Promise = require("bluebird")</code> 替换全局的 Promise 对象）</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Node.js 版本</th>
+          <th>异步方式</th>
+          <th>花费时间（s）</th>
+          <th>内存占用（MB）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>v4.x</td>
+          <td>Generator</td>
+          <td>10.54</td>
+          <td>86.2</td>
+        </tr>
+        <tr>
+          <td>v6.x</td>
+          <td>Generator</td>
+          <td>8.17</td>
+          <td>78.9</td>
+        </tr>
+        <tr>
+          <td>v8.x</td>
+          <td>Generator</td>
+          <td>5.46</td>
+          <td>90.3</td>
+        </tr>
+        <tr>
+          <td>同上</td>
+          <td>async</td>
+          <td><strong>16.25</strong></td>
+          <td><strong>34</strong></td>
+        </tr>
+        <tr>
+          <td>v9.x</td>
+          <td>Generator</td>
+          <td>5.83</td>
+          <td>93.7</td>
+        </tr>
+        <tr>
+          <td>同上</td>
+          <td>async</td>
+          <td><strong>15.39</strong></td>
+          <td><strong>34.7</strong></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>对比上面两张表格可以看出，在 v4.x 和 v6.x 的时候，使用 bluebird 差不多有 2 倍的性能提升。但是，在 v8.x 之后却是相反的。因此，<strong>Node.js v8.x 的原生 Promise
+        已经得到了很大的优化，可以不需要使用 bluebird 这样的第三方 Promise 库；如果使用了 async function，替换原生的 Promise 反而会大大降低性能。</strong></p>
+    <p>好了，最最关键的问题来了：<strong>使用 async function 与 callback 方式做同样的事情性能相差多少？</strong></p>
+    <p>以下是我将上文的代码  经过简单的转换而成的 callback 写法：</p>
+    <pre><code class="lang-javascript"><span class="hljs-meta">"use strict"</span>;
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">add</span>(<span class="hljs-params">n, callback</span>) </span>{
+      process.nextTick(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> callback(<span class="hljs-literal">null</span>, n + <span class="hljs-number">1</span>));
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">call</span>(<span class="hljs-params">callback</span>) </span>{
+      add(<span class="hljs-number">1</span>, (err, a) =&gt; {
+        <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> callback(err);
+        add(<span class="hljs-number">2</span>, (err, b) =&gt; {
+          <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> callback(err);
+          add(<span class="hljs-number">3</span>, (err, c) =&gt; {
+            <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> callback(err);
+            add(<span class="hljs-number">4</span>, (err, d) =&gt; {
+              <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">return</span> callback(err);
+              callback(<span class="hljs-literal">null</span>, a + b + c + d === <span class="hljs-number">14</span>);
+            });
+          });
+        });
+      });
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">test</span>(<span class="hljs-params">n</span>) </span>{
+      <span class="hljs-keyword">const</span> version = <span class="hljs-string">`node <span class="hljs-subst">${process.version}</span>`</span>;
+      <span class="hljs-keyword">const</span> name = __filename
+        .split(<span class="hljs-regexp">/\\|\//</span>)
+        .pop()
+        .slice(<span class="hljs-number">0</span>, <span class="hljs-number">-3</span>);
+      <span class="hljs-keyword">const</span> title = <span class="hljs-string">`<span class="hljs-subst">${version}</span> <span class="hljs-subst">${name}</span> with callback - test <span class="hljs-subst">${n}</span> times`</span>;
+      <span class="hljs-keyword">const</span> time = process.uptime();
+      <span class="hljs-keyword">const</span> done = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+        <span class="hljs-built_in">console</span>.log(
+          <span class="hljs-string">"%s - %ds - %dMB"</span>,
+          title,
+          (process.uptime() - time).toFixed(<span class="hljs-number">2</span>),
+          (process.memoryUsage().rss / <span class="hljs-number">1000000</span>).toFixed(<span class="hljs-number">1</span>)
+        );
+      };
+      <span class="hljs-keyword">let</span> i = <span class="hljs-number">0</span>;
+      <span class="hljs-keyword">const</span> next = <span class="hljs-function"><span class="hljs-params">err</span> =&gt;</span> {
+        <span class="hljs-keyword">if</span> (err) <span class="hljs-keyword">throw</span> err;
+        <span class="hljs-keyword">if</span> (i &lt; n) {
+          i++;
+          process.nextTick(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> call(next));
+        } <span class="hljs-keyword">else</span> {
+          done();
+        }
+      };
+      next();
+    }
+
+    <span class="hljs-keyword">const</span> K = <span class="hljs-number">1000</span>;
+    <span class="hljs-keyword">let</span> num = <span class="hljs-built_in">parseInt</span>(process.env.NUM, <span class="hljs-number">10</span>);
+    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">isNaN</span>(num) || !(num &gt; <span class="hljs-number">0</span>)) {
+      num = <span class="hljs-number">100</span>;
+    }
+    test(num * K);
+    </code></pre>
+    <p>说明：</p>
+    <ul>
+      <li>所有异步函数的回调函数格式为 <code>callback(err, ret)</code>，如果没有错误则 <code>err = null</code>，<code>ret</code> 表示返回值</li>
+      <li>所有异步回调第一行都会检查 <code>if (err) return callback(err)</code>，虽然看起来啰嗦，但是要尽量模拟真是的场景</li>
+      <li>每次执行 <code>call()</code> 都需要放在 <code>process.nextTick()</code> 回调函数里面，主要是用于模拟一个异步操作，否则程序会因为调用堆栈过深而报错</li>
+    </ul>
+    <p>以下是执行结果：</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Node.js 版本</th>
+          <th>花费时间（s）</th>
+          <th>内存占用（MB）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>v4.x</td>
+          <td><strong>0.64</strong></td>
+          <td>54.8</td>
+        </tr>
+        <tr>
+          <td>v6.x</td>
+          <td>0.65</td>
+          <td>54.8</td>
+        </tr>
+        <tr>
+          <td>v8.x</td>
+          <td>1.04</td>
+          <td><strong>27.5</strong></td>
+        </tr>
+        <tr>
+          <td>v9.x</td>
+          <td>1.03</td>
+          <td>27.5</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>使用 <code>async function</code> 编写的代码在 Node.js v8.x 花费的时间是 <strong>1.76s</strong>，内存占用是
+      <strong>31.5MB</strong>，与使用 <code>callback</code> 编写的代码相比，<strong>数值相差并不大（执行 100 万次时间相差不足 1 秒），属于可以接受范围</strong>。
+    </p>
+    <h2 id="-">结论</h2>
+    <p>以上可以算是一个 <em>不太严谨</em> 的测试方案，并没有全面地测试不同实现方式对结果的影响，也没有重复执行多次的测试来尽量减少结果偏差。但无论怎样，通过这些测试结果我们还是可以知道：</p>
+    <ul>
+      <li>从 v4.x 到 v8.x，Node.js 的整体性能有了很大的提升</li>
+      <li>Node.js v8.x 的原生 Promise 已经足够快，不再需要使用 bluebird 来代替了</li>
+      <li>直接执行 async function 比转换成相应的 Generator 代码要快很多</li>
+      <li>使用 async function 编写代码跟使用 callback 方式编写代码之间的性能差异已经很小了，而 async function 的代码往往更直观</li>
+    </ul>
+    <p>新的 ES 语法大大简化了异步编程的难度，而随着 Node.js 版本的升级，刚开始担心的那些性能问题也终将化为浮云。</p>
+    <p>所以，<strong>如果你已经用上了 Node.js v8.x，而且不需要兼容老的 Node.js 版本，可以放心大胆地使用 async function 啦。</strong></p>
+    <h2 id="-">相关链接</h2>
+    <ul>
+      <li><a
+          href="https://hackernoon.com/6-reasons-why-javascripts-async-await-blows-promises-away-tutorial-c7ec10518dd9">6
+          Reasons Why JavaScript’s Async/Await Blows Promises Away (Tutorial)</a></li>
+      <li><a href="https://kyrylkov.com/2017/04/25/native-promises-async-functions-nodejs-8-performance/">Performance of
+          native ES2015 promises and ES2017 async functions in Node.js v8</a></li>
+      <li><a href="https://medium.com/@Abazhenov/using-async-await-in-express-with-node-8-b8af872c0016">Using Async
+          Await in Express with Node 9</a></li>
+      <li><a href="http://voidcanvas.com/explaining-async-await-es7-examples/">Explaining async await of ES8 with
+          examples</a></li>
+      <li><a href="http://morning.work/page/maintainable-nodejs/asynchronous-programming.html">基于 Generator 与 Promise
+          的异步编程解决方案</a></li>
+      <li><a href="https://zhuanlan.zhihu.com/p/28552625">Node.js 性能调优之代码篇(一)——使用原生模块</a></li>
+      <li><a href="https://zhuanlan.zhihu.com/p/28702422">Node.js 性能调优之代码篇(三)—— 升级到 Node@8</a></li>
+    </ul>
+
+  </article>
+</body>
+
+</html>
