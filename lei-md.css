@@ -31,6 +31,8 @@
 .lei-md {
   font-feature-settings: "tnum";
   font-variant: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   font-size: 14px;
   font-family: Tahoma For Number, Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;
   color: #262626;
@@ -39,6 +41,13 @@
   outline-style: none;
   word-wrap: break-word;
   -webkit-user-select: auto;
+  max-width: 752px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.lei-md ::selection {
+  color: inherit;
+  background: rgba(27, 162, 227, 0.2);
 }
 .lei-md h1,
 .lei-md h2,
@@ -59,6 +68,7 @@
   line-height: 1.389;
   font-weight: 700;
   color: #262626;
+  margin-bottom: 32px;
 }
 .lei-md h2 {
   font-size: 24px;
@@ -95,4 +105,134 @@
 .lei-md a:active {
   word-wrap: break-word;
   color: #096dd9;
+}
+.lei-md img {
+  max-width: 100%;
+  vertical-align: middle;
+  border-style: none;
+  border-radius: 2px 2px;
+  display: inline-block;
+  opacity: 1;
+  text-align: left;
+  transition: opacity 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  -webkit-user-select: all;
+  -moz-user-select: all;
+  -ms-user-select: all;
+  user-select: all;
+}
+.lei-md pre {
+  border-radius: 0;
+  border-width: 0;
+  background: #f9f9f9;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+  white-space: pre;
+  word-wrap: normal;
+  line-height: inherit;
+  color: inherit;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-variant-ligatures: contextual;
+  font-variant-ligatures: contextual;
+  position: relative;
+  padding: 16px;
+  overflow: visible;
+  border: 1px solid #e8e8e8;
+  border-radius: 2px 2px;
+  text-indent: 0;
+  overflow-y: scroll;
+  overflow-x: visible;
+}
+.lei-md code {
+  font-family: monospace;
+  font-size: inherit;
+  background-color: rgba(0, 0, 0, 0.06);
+  padding: 0 2px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 2px 2px;
+  line-height: inherit;
+  word-wrap: break-word;
+  text-indent: 0;
+  margin-left: 0.3em;
+  margin-right: 0.3em;
+}
+.lei-md pre code {
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+  font-size: 13px;
+  line-height: 21px;
+  color: #595959;
+  direction: ltr;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.lei-md table {
+  position: relative;
+  table-layout: fixed;
+  border-collapse: collapse;
+  border-spacing: 0;
+  word-wrap: break-word;
+  word-break: normal;
+  margin: 0;
+  font-weight: 400;
+  box-sizing: border-box;
+  border: 1px solid #d9d9d9;
+  cursor: default;
+  width: 96%;
+}
+.lei-md tbody,
+.lei-md tr,
+.lei-md th,
+.lei-md td {
+  margin: 0;
+  font-weight: 400;
+  box-sizing: border-box;
+}
+.lei-md table tr td,
+.lei-md table tr th {
+  margin: 0;
+  font-weight: 400;
+  box-sizing: border-box;
+  min-width: 90px;
+  font-size: 14px;
+  white-space: normal;
+  word-wrap: break-word;
+  border: 1px solid #d9d9d9;
+  vertical-align: top;
+  padding: 4px 8px;
+  cursor: default;
+}
+.lei-md ul {
+  margin: 0 0 0 3px;
+  padding: 0;
+  list-style: none;
+  list-style-type: disc;
+}
+.lei-md li {
+  white-space: normal;
+  margin-left: 23px;
+}
+.lei-md.auto-fix {
+  margin-top: 82px;
+  margin-bottom: 96px;
+}
+.lei-md.auto-fix h1,
+.lei-md.auto-fix h2,
+.lei-md.auto-fix h3,
+.lei-md.auto-fix h4,
+.lei-md.auto-fix h5,
+.lei-md.auto-fix h6 {
+  margin-bottom: 1em;
+  margin-top: 2em;
+}
+.lei-md.auto-fix h1:first-child {
+  margin-top: 0;
+}
+.lei-md.auto-fix p,
+.lei-md.auto-fix ul,
+.lei-md.auto-fix table,
+.lei-md.auto-fix pre {
+  margin-bottom: 1.8em;
 }
