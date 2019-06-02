@@ -7,7 +7,8 @@
     "example": "examples"
   },
   "scripts": {
-    "build": "lessc lei-md.less lei-md.css"
+    "build": "lessc lei-md.less lei-md.css",
+    "dev": "nodemon -e \"less\" -x \"./node_modules/.bin/lessc lei-md.less lei-md.css\""
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   },
   "homepage": "https://github.com/leizongmin/lei-markdown-style#readme",
   "devDependencies": {
-    "less": "^3.9.0"
+    "less": "^3.9.0",
+    "nodemon": "^1.19.1"
   }
 }
