@@ -15,6 +15,12 @@ Markdown样式文件
 
 可参考 `examples` 目录的示例文件。
 
+## 预览效果
+
+- [file1](https://raw.githack.com/leizongmin/lei-markdown-style/master/examples/file1.html)
+- [file2](https://raw.githack.com/leizongmin/lei-markdown-style/master/examples/file2.html)
+- [file3](https://raw.githack.com/leizongmin/lei-markdown-style/master/examples/file3.html)
+
 
 ## License
 
