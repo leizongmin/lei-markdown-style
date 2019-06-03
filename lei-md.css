@@ -224,15 +224,36 @@
   padding: 4px 8px;
   cursor: default;
 }
-.lei-md ul {
+.lei-md ul,
+.lei-md ol {
   margin: 0 0 0 3px;
   padding: 0;
+  padding-left: 23px;
   list-style: none;
-  list-style-type: disc;
 }
 .lei-md li {
   white-space: normal;
   margin-left: 23px;
+}
+.lei-md > ul {
+  padding-left: 0;
+  list-style-type: disc;
+}
+.lei-md > ul > ul {
+  list-style-type: circle;
+}
+.lei-md > ul > ul > ul {
+  list-style-type: square;
+}
+.lei-md > ol {
+  padding-left: 0;
+  list-style-type: decimal;
+}
+.lei-md > ol > ol {
+  list-style-type: lower-alpha;
+}
+.lei-md > ol > ol > ol {
+  list-style-type: lower-roman;
 }
 .lei-md hr {
   box-sizing: border-box;
