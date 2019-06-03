@@ -224,6 +224,10 @@
   padding: 4px 8px;
   cursor: default;
 }
+.lei-md th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
 .lei-md ul,
 .lei-md ol {
   margin: 0 0 0 3px;

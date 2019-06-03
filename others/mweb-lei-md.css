@@ -385,6 +385,10 @@
    padding: 4px 8px;
    cursor: default;
  }
+ .markdown-body th {
+   background-color: #f0f0f0;
+   font-weight: bold;
+ }
  .markdown-body ul,
  .markdown-body ol {
    margin: 0 0 0 3px;
