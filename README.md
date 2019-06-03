@@ -8,7 +8,7 @@ Markdown样式文件
 <link rel="stylesheet" href="lei-md.css">
 
 <!-- 在文章内容容器指定样式类 -->
-<article class="lei-md auto-fix">
+<article class="lei-md lei-md-auto-fix">
   <p>这里是文章内容</p>
 </article>
 ```

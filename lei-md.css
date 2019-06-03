@@ -253,27 +253,27 @@
   border-left: 3px solid #eee;
   opacity: 0.6;
 }
-.lei-md.auto-fix {
+.lei-md.lei-md-auto-fix {
   margin-top: 82px;
   margin-bottom: 96px;
 }
-.lei-md.auto-fix h1,
-.lei-md.auto-fix h2,
-.lei-md.auto-fix h3,
-.lei-md.auto-fix h4,
-.lei-md.auto-fix h5,
-.lei-md.auto-fix h6 {
+.lei-md.lei-md-auto-fix h1,
+.lei-md.lei-md-auto-fix h2,
+.lei-md.lei-md-auto-fix h3,
+.lei-md.lei-md-auto-fix h4,
+.lei-md.lei-md-auto-fix h5,
+.lei-md.lei-md-auto-fix h6 {
   margin-bottom: 1em;
   margin-top: 2em;
 }
-.lei-md.auto-fix h1:first-child {
+.lei-md.lei-md-auto-fix h1:first-child {
   margin-top: 0;
 }
-.lei-md.auto-fix p,
-.lei-md.auto-fix ul,
-.lei-md.auto-fix table,
-.lei-md.auto-fix pre,
-.lei-md.auto-fix hr,
-.lei-md.auto-fix blockquote {
+.lei-md.lei-md-auto-fix p,
+.lei-md.lei-md-auto-fix ul,
+.lei-md.lei-md-auto-fix table,
+.lei-md.lei-md-auto-fix pre,
+.lei-md.lei-md-auto-fix hr,
+.lei-md.lei-md-auto-fix blockquote {
   margin-bottom: 1.8em;
 }
