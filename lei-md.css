@@ -122,6 +122,9 @@
   word-wrap: break-word;
   color: #096dd9;
 }
+.lei-md a:hover {
+  color: #1890ff;
+}
 .lei-md img {
   max-width: 100%;
   vertical-align: middle;
