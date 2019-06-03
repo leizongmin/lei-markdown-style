@@ -442,24 +442,24 @@
    margin-top: 82px;
    margin-bottom: 96px;
  }
- .markdown-body h1,
- .markdown-body h2,
- .markdown-body h3,
- .markdown-body h4,
- .markdown-body h5,
- .markdown-body h6 {
+ .markdown-body > h1,
+ .markdown-body > h2,
+ .markdown-body > h3,
+ .markdown-body > h4,
+ .markdown-body > h5,
+ .markdown-body > h6 {
    margin-bottom: 1em;
    margin-top: 2em;
  }
- .markdown-body h1:first-child {
+ .markdown-body > h1:first-child {
    margin-top: 0;
  }
- .markdown-body p,
- .markdown-body ul,
- .markdown-body ol,
- .markdown-body table,
- .markdown-body pre,
- .markdown-body hr,
- .markdown-body blockquote {
+ .markdown-body > p,
+ .markdown-body > ul,
+ .markdown-body > ol,
+ .markdown-body > table,
+ .markdown-body > pre,
+ .markdown-body > hr,
+ .markdown-body > blockquote {
    margin-bottom: 1.8em;
  }
