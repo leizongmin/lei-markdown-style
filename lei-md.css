@@ -48,17 +48,35 @@
   font-weight: 700;
 }
 .lei-md h1 {
-  font-family: Chinese Quote, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, PingFang SC, Hiragino Sans GB, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif;
-  font-size: 36px;
-  line-height: 1.389;
-  font-weight: 700;
-  color: #262626;
-  margin-bottom: 32px;
+  font-size: 28px;
+  line-height: 36px;
+  padding: 7px 0;
 }
 .lei-md h2 {
   font-size: 24px;
   line-height: 32px;
   padding: 7px 0;
+}
+.lei-md h3 {
+  font-size: 20px;
+  line-height: 28px;
+  padding: 7px 0;
+}
+.lei-md h4 {
+  font-size: 16px;
+  line-height: 24px;
+  padding: 7px 0;
+}
+.lei-md h5 {
+  font-size: 14px;
+  line-height: 24px;
+  padding: 7px 0;
+}
+.lei-md h6 {
+  font-size: 14px;
+  line-height: 24px;
+  padding: 7px 0;
+  font-weight: 400;
 }
 .lei-md p {
   display: block;
@@ -75,6 +93,19 @@
 .lei-md b,
 .lei-md strong {
   font-weight: bolder;
+}
+.lei-md sup {
+  top: -0.5em;
+}
+.lei-md sub {
+  bottom: -0.25em;
+}
+.lei-md sup,
+.lei-md sub {
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
 }
 .lei-md a {
   color: #096dd9;
@@ -139,8 +170,8 @@
   line-height: inherit;
   word-wrap: break-word;
   text-indent: 0;
-  margin-left: 0.3em;
-  margin-right: 0.3em;
+  margin-left: 0.2em;
+  margin-right: 0.2em;
 }
 .lei-md pre code {
   font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
