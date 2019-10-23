@@ -7,7 +7,9 @@
     "example": "examples"
   },
   "scripts": {
-    "build": "lessc lei-md.less lei-md.css",
+    "build": "npm run build-main && npm run build-mweb",
+    "build-main": "lessc lei-md.less lei-md.css",
+    "build-mweb": "node others/build-mweb.js",
     "dev": "nodemon -e \"less\" -x \"./node_modules/.bin/lessc lei-md.less lei-md.css\""
   },
   "repository": {
