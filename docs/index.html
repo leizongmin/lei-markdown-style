@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>老雷专用Markdown转微信编辑器</title>
+  <link rel="stylesheet" href="./lei-md.css">
+  <style>
+    #left {
+      width: 49%;
+      margin: 0;
+      padding: 0;
+      float: left;
+    }
+
+    #right {
+      width: 49%;
+      margin: 0;
+      padding: 0;
+      float: right;
+    }
+
+    #editor {
+      width: 100%;
+      height: 600px;
+      border: 1px solid grey
+    }
+
+    #preview-outer {
+      overflow-y: scroll;
+    }
+
+    #preview {
+      padding: 0 20px;
+    }
+
+    .lei-md.lei-md-auto-fix {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    #copy-button {
+      width: 100%;
+      display: block;
+      padding: 0;
+      margin: 0;
+      height: 20px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="left">
+    <div id="editor"></div>
+  </div>
+  <div id="right">
+    <button id="copy-button" onclick="copyToClipboard()">点这里复制，然后黏贴到微信编辑器</button>
+    <div id="preview-outer">
+      <div id="preview" class="lei-md lei-md-auto-fix"></div>
+    </div>
+  </div>
+</body>
+
+</html>
+<link rel="stylesheet" href="./highlight/styles/github.css">
+<script src="./highlight/highlight.pack.js"></script>
+<script src="./marked.min.js"></script>
+<script>
+  var renderer = new marked.Renderer();
+  marked.setOptions({
+    renderer,
+    highlight: (code, lang) => {
+      if (lang && hljs.getLanguage(lang)) {
+        return hljs.highlight(lang, code).value;
+      }
+    },
+    gfm: true,
+    tables: true,
+    breaks: false,
+    pedantic: false,
+    sanitize: true,
+    smartLists: true,
+    smartypants: true
+  });
+
+  function renderMarkdown(source) {
+    return marked(source);
+  }
+</script>
+<link rel="stylesheet" data-name="vs/editor/editor.main" href="./monaco-editor/min/vs/editor/editor.main.css">
+<script>var require = { paths: { 'vs': './monaco-editor/min/vs' } };</script>
+<script src="./monaco-editor/min/vs/loader.js"></script>
+<script src="./monaco-editor/min/vs/editor/editor.main.nls.js"></script>
+<script src="./monaco-editor/min/vs/editor/editor.main.js"></script>
+<script>
+  document.getElementById("editor").style.height = (window.innerHeight - 20) + "px";
+  document.getElementById("preview-outer").style.height = (window.innerHeight - 50) + "px";
+
+  var editor = monaco.editor.create(document.getElementById('editor'), {
+    value: '# 使用方法\n\n**在此处输入文章的Markdown源码，复制右侧的内容到微信编辑器即可**\n\n项目地址：https://github.com/leizongmin/lei-markdown-style\n\n',
+    language: 'markdown',
+    minimap: { enabled: false },
+    lineNumbers: 'off',
+    fontSize: 14,
+  });
+
+  var isChanged = true;
+  editor.onDidChangeModelContent(function (e) {
+    isChanged = true;
+  });
+  setInterval(function () {
+    if (!isChanged) {
+      return;
+    }
+    isChanged = false;
+    var content = editor.getValue();
+    var html = renderMarkdown(content);
+    document.getElementById("preview").innerHTML = html;
+  }, 1000);
+
+  function copyToClipboard() {
+    var range = document.createRange();
+    range.selectNode(document.getElementById("preview"));
+    window.getSelection().addRange(range);
+    document.execCommand("copy");
+  }
+</script>
