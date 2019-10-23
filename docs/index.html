@@ -86,6 +86,14 @@
     smartypants: true
   });
 
+  renderer.link = function (href, title, text) {
+    var html = `<a href="${href}" title="${title || ""}">${text}</a>`;
+    if (text.indexOf("http://") !== 0 && text.indexOf("https://") !== 0) {
+      html += `（链接：<a href="${href}" title="${text}">${href}</a> ）`;
+    }
+    return html;
+  };
+
   function renderMarkdown(source) {
     return marked(source);
   }
