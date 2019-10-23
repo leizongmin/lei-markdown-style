@@ -90,6 +90,7 @@
   white-space: normal;
   margin: 0;
   letter-spacing: 0.05em;
+  font-size: 14px;
 }
 .lei-md b,
 .lei-md strong {
@@ -257,6 +258,9 @@
 }
 .lei-md > ol > ol > ol {
   list-style-type: lower-roman;
+}
+.lei-md li > * {
+  font-size: 14px;
 }
 .lei-md hr {
   box-sizing: border-box;
