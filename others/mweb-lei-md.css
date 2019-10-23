@@ -420,7 +420,11 @@
 .markdown-body > ol > ol > ol {
   list-style-type: lower-roman;
 }
-.markdown-body li > * {
+.markdown-body li,
+.markdown-body li p,
+.markdown-body li section,
+.markdown-body li a,
+.markdown-body li * {
   font-size: 14px;
 }
 .markdown-body hr {

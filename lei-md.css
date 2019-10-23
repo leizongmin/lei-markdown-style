@@ -259,7 +259,11 @@
 .lei-md > ol > ol > ol {
   list-style-type: lower-roman;
 }
-.lei-md li > * {
+.lei-md li,
+.lei-md li p,
+.lei-md li section,
+.lei-md li a,
+.lei-md li * {
   font-size: 14px;
 }
 .lei-md hr {

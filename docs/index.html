@@ -94,6 +94,10 @@
     return html;
   };
 
+  renderer.listitem = function (text) {
+    return "<li><section style='font-size:14px;'>" + text + "</section></li>\n";
+  };
+
   function renderMarkdown(source) {
     return marked(source);
   }
